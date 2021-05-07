@@ -32,10 +32,31 @@ public class FXMLController {
 
     @FXML // fx:id="btnAnalizza"
     private Button btnAnalizza; // Value injected by FXMLLoader
+  
 
     @FXML
     void doAnalizzaAeroporti(ActionEvent event) {
-    	//TODO
+    	
+    	txtResult.clear();
+    	txtResult.setEditable(false);
+    	double distanza;
+    	
+    	try {
+    		distanza=Double.parseDouble(distanzaMinima.getText());
+    	}
+    	catch(NumberFormatException e) {
+    		txtResult.setText("Devi inserire un numero");
+    		return;
+    	}
+    	
+    	this.model.creaGrafo(distanza);
+    	
+    	txtResult.appendText("Grafo creato con: "+ model.getNVertici()+" vertici e "+model.getNArchi()+" archi.");
+    	txtResult.appendText("\n\nElenco rotte: \n");
+    	
+    	txtResult.appendText(model.stampa());
+    	
+    	
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete

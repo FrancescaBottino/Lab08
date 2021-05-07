@@ -7,10 +7,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import it.polito.tdp.extflightdelays.model.Airline;
 import it.polito.tdp.extflightdelays.model.Airport;
 import it.polito.tdp.extflightdelays.model.Flight;
+import it.polito.tdp.extflightdelays.model.Tratta;
 
 public class ExtFlightDelaysDAO {
 
@@ -91,4 +93,45 @@ public class ExtFlightDelaysDAO {
 			throw new RuntimeException("Error Connection Database");
 		}
 	}
+	
+	
+	public List<Tratta> getTratte(Map<Integer, Airport> airportMap, double x){
+		
+		//ottengo quante sono le tratte che collegano due aeroporti
+		
+		String sql="SELECT ORIGIN_AIRPORT_ID as id_a1, DESTINATION_AIRPORT_ID as id_a2, AVG(DISTANCE) as media "
+				+ "FROM flights  "
+				+ "GROUP BY ORIGIN_AIRPORT_ID,DESTINATION_AIRPORT_ID "
+				+ "HAVING media >= ? ";
+				
+		List<Tratta> result=new ArrayList<Tratta>();
+		
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setDouble(1, x);
+			ResultSet rs = st.executeQuery();
+			
+			while(rs.next()) {
+				
+				Airport a1= airportMap.get(rs.getInt("id_a1"));
+				Airport a2=airportMap.get(rs.getInt("id_a2"));
+				
+				Tratta t= new Tratta(a1, a2, rs.getDouble("media"));
+				result.add(t);
+				
+			}
+			conn.close();
+			return result;
+
+			
+		}catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+		
+		
+	}
+	
 }
